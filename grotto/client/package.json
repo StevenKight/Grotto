@@ -11,9 +11,14 @@
     "openapi-codegen": "openapi-ts --input ../backend/openapi.yaml --output ./src/api"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.20.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-router": "^7.13.1"
+    "react-router": "^7.13.1",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
