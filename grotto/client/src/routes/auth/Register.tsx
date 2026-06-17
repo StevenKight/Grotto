@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
-import './auth.css'
+import { cn } from '@/lib/utils'
 
 const STRENGTH_LABELS = ['Weak', 'Fair', 'Good', 'Strong']
+const STRENGTH_COLORS = ['bg-destructive', 'bg-amber-500', 'bg-green-600', 'bg-primary']
+const STRENGTH_TEXT_COLORS = ['text-destructive', 'text-amber-500', 'text-green-600', 'text-primary']
 
 function getPasswordStrength(pw: string): number {
   if (pw.length === 0) return 0
@@ -83,143 +86,144 @@ export default function Register() {
   }
 
   return (
-    <div className="auth-page">
-    <div className="auth-root">
-      {/* Left panel */}
-      <div className="auth-left">
-        <div className="auth-left-top">
-          <div className="auth-wordmark">
-            <div className="auth-wordmark-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <rect x="1" y="10" width="3" height="5" rx="1" fill="rgba(255,255,255,0.55)" />
-                <rect x="6" y="6" width="3" height="9" rx="1" fill="rgba(255,255,255,0.7)" />
-                <rect x="11" y="2" width="3" height="13" rx="1" fill="rgba(255,255,255,0.9)" />
-              </svg>
-            </div>
-            <span className="auth-wordmark-name">Grotto</span>
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md text-left">
+        <div className="flex items-center justify-center gap-2 mb-8">
+          <div className="w-9 h-9 rounded-md bg-foreground/10 border border-border-media flex items-center justify-center">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="1" y="10" width="3" height="5" rx="1" fill="currentColor" className="text-foreground/55" />
+              <rect x="6" y="6" width="3" height="9" rx="1" fill="currentColor" className="text-foreground/70" />
+              <rect x="11" y="2" width="3" height="13" rx="1" fill="currentColor" className="text-foreground/90" />
+            </svg>
           </div>
-          <div className="auth-hero">
-            <h1 className="auth-hero-heading">
-              Everything you<br />need to manage<br /><em>your library.</em>
-            </h1>
-            <p className="auth-hero-sub">
-              Connect your sources, queue up requests, and keep your library
-              organized — all in one private workspace.
-            </p>
-          </div>
+          <h1 className="text-2xl font-bold">Grotto</h1>
         </div>
 
-        <div className="auth-feature-list">
-          {[
-            { title: 'Unified search', desc: 'Search movies, shows, and anime across every connected source.' },
-            { title: 'Automated downloads', desc: 'Requests route straight to your Sonarr and Radarr instances.' },
-            { title: 'One dashboard', desc: 'Track everything in your library from a single place.' },
-          ].map(({ title, desc }) => (
-            <div className="auth-feature-item" key={title}>
-              <div className="auth-feature-dot" />
-              <div>
-                <p className="auth-feature-title">{title}</p>
-                <p className="auth-feature-desc">{desc}</p>
-              </div>
+        <div className="bg-card border border-border-media rounded-xl p-8">
+          <h2 className="text-2xl font-bold mb-2 text-center">Join Grotto</h2>
+          <p className="text-muted-foreground text-sm mb-6 text-center">
+            Create an account to start building your library
+          </p>
+
+          {error && (
+            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 mb-6">
+              <p className="text-destructive text-sm">{error}</p>
             </div>
-          ))}
-        </div>
-      </div>
+          )}
 
-      {/* Right panel */}
-      <div className="auth-right">
-        <p className="auth-form-eyebrow">Create your account</p>
-        <h2 className="auth-form-title">Start building your<br />library</h2>
-
-        {error && <p className="auth-api-error">{error}</p>}
-
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="auth-form-group">
-            <label className="auth-form-label">Username</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              autoComplete="username"
-              placeholder="johndoe"
-              className={`auth-form-input${usernameError ? ' error' : ''}${usernameShake ? ' auth-shake' : ''}`}
-            />
-            {usernameError && <p className="auth-field-error">Required.</p>}
-          </div>
-
-          <div className="auth-form-group">
-            <label className="auth-form-label">Email address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              placeholder="you@example.com"
-              className={`auth-form-input${emailError ? ' error' : ''}${emailShake ? ' auth-shake' : ''}`}
-            />
-            {emailError && (
-              <p className="auth-field-error">Please enter a valid email address.</p>
-            )}
-          </div>
-
-          <div className="auth-form-group">
-            <label className="auth-form-label">Password</label>
-            <div className="auth-input-wrap">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-                placeholder="••••••••••"
-                className={`auth-form-input${passwordError ? ' error' : ''}${passwordShake ? ' auth-shake' : ''}`}
-              />
-              <span
-                className="auth-input-suffix"
-                onClick={() => setShowPassword((v) => !v)}
-              >
-                {showPassword ? 'hide' : 'show'}
-              </span>
-            </div>
-            <div
-              className="auth-strength-bar"
-              data-strength={password.length > 0 ? strength : 0}
-            >
-              {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="auth-strength-segment" />
-              ))}
-            </div>
-            {password.length > 0 && (
-              <div className="auth-strength-label" data-strength={strength}>
-                {STRENGTH_LABELS[strength - 1]}
-              </div>
-            )}
-            {passwordError && (
-              <p className="auth-field-error">Password must be at least 8 characters.</p>
-            )}
-          </div>
-
-          <button type="submit" disabled={loading} className="auth-submit-btn">
-            {loading ? 'Creating account…' : 'Create account'}
-            {!loading && (
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path
-                  d="M2 7h10M8 3l4 4-4 4"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Username</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="username"
+                  placeholder="your_username"
+                  className={cn(
+                    'w-full pl-10 pr-4 py-2.5 bg-secondary border border-border-media rounded-lg placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all',
+                    usernameError && 'border-destructive',
+                    usernameShake && 'animate-shake',
+                  )}
                 />
-              </svg>
-            )}
-          </button>
-        </form>
+              </div>
+              {usernameError && <p className="text-xs text-destructive mt-1.5">Required.</p>}
+            </div>
 
-        <div className="auth-bottom-row">
-          <span className="auth-bottom-text">Already have an account? </span>
-          <Link to="/login" className="auth-bottom-link">Sign in</Link>
+            <div>
+              <label className="block text-sm font-medium mb-2">Email address</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  className={cn(
+                    'w-full pl-10 pr-4 py-2.5 bg-secondary border border-border-media rounded-lg placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all',
+                    emailError && 'border-destructive',
+                    emailShake && 'animate-shake',
+                  )}
+                />
+              </div>
+              {emailError && (
+                <p className="text-xs text-destructive mt-1.5">Please enter a valid email address.</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                  placeholder="••••••••"
+                  className={cn(
+                    'w-full pl-10 pr-10 py-2.5 bg-secondary border border-border-media rounded-lg placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all',
+                    passwordError && 'border-destructive',
+                    passwordShake && 'animate-shake',
+                  )}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+
+              <div className="flex gap-1 mt-2">
+                {[0, 1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      'flex-1 h-[3px] rounded-full bg-border-media transition-colors',
+                      password.length > 0 && i < strength && STRENGTH_COLORS[strength - 1],
+                    )}
+                  />
+                ))}
+              </div>
+              {password.length > 0 && (
+                <p className={cn('text-xs mt-1.5', STRENGTH_TEXT_COLORS[strength - 1])}>
+                  {STRENGTH_LABELS[strength - 1]}
+                </p>
+              )}
+              {passwordError && (
+                <p className="text-xs text-destructive mt-1.5">Password must be at least 8 characters.</p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2.5 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading ? 'Creating account…' : 'Create account'}
+              {!loading && <ArrowRight className="w-4 h-4" />}
+            </button>
+          </form>
+
+          <div className="flex items-center gap-3 my-6">
+            <div className="flex-1 h-px bg-border-media" />
+            <span className="text-xs text-muted-foreground">OR</span>
+            <div className="flex-1 h-px bg-border-media" />
+          </div>
+
+          <p className="text-sm text-center text-muted-foreground">
+            Already have an account?{' '}
+            <Link to="/login" className="text-primary hover:text-primary/80 font-semibold transition-colors">
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
-    </div>
     </div>
   )
 }
